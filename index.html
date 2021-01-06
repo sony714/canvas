@@ -9,19 +9,71 @@
 <style>
     * {
         padding: 0;
-        border: 0;
         box-sizing: border-box;
     }
 
     #canvas {
-        width: 100vw;
-        height: 100vh;
-        border: 1px solid red;
+        display: block;
+        /* border: 1px solid red; */
     }
 </style>
 
 <body>
     <canvas id="canvas"></canvas>
 </body>
+<script>
+    let canvas = document.getElementById('canvas');
+    canvas.width = document.documentElement.clientWidth;
+    canvas.height = document.documentElement.clientHeight;
+    let ctx = canvas.getContext('2d');
+    ctx.fillStyle = "rgb(200,0,0)";
+    ctx.strokeStyle = 'none';
+    let painting = false;
+    let Touch = 'ontouchstart' in document.documentElement;
+    var last;
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+
+    let drawLine = (x1, x2, y1, y2) => {
+        ctx.beginPath();
+        ctx.moveTo(x1, x2);
+        ctx.lineTo(y1, y2);
+        ctx.stroke();
+    }
+    if (Touch) {
+        canvas.ontouchstart = (e) => {
+            let x = e.touches[0].clientX;
+            let y = e.touches[0].clientY;
+            last = [x, y]
+        }
+    }
+    {
+        canvas.ontouchmove = (e) => {
+            let x = e.touches[0].clientX;
+            let y = e.touches[0].clientY;
+            drawLine(last[0], last[1], x, y)
+            last = [x, y]
+        }
+    } {
+        canvas.onmousedown = (e) => {
+            painting = true;
+            last = [e.clientX, e.clientY]
+        }
+
+        canvas.onmousemove = (e) => {
+            if (painting) {
+                drawLine(last[0], last[1], e.clientX, e.clientY)
+                last = [e.clientX, e.clientY]
+            } else {
+                console.log('什么都不做');
+            }
+        }
+
+        canvas.onmouseup = (e) => {
+            painting = false;
+        }
+    }
+
+</script>
 
 </html>
